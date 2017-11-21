@@ -38,8 +38,6 @@ void Visitor::TableMaker::Visit(CClassSequence* node) {
 }
 
 void Visitor::TableMaker::Visit(CId* node) {
-	assert(false);
-	// visiting plain ids is not supposed to happen in this visitor
 }
 
 void Visitor::TableMaker::Visit(CMain* node) {

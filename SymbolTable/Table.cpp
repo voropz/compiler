@@ -85,7 +85,6 @@ namespace SymbolTable {
 		for (const auto& var : method->get_block()) {
 			out << var.second->get_type().get_name() << " " << var.second->get_name()->get_text() << ", ";
 		}
-		out << std::endl << "returns " << method->get_return_type().get_name() << std::endl << std::endl;
 
 	}
 }
