@@ -11,12 +11,10 @@ namespace SymbolTable {
 	typedef std::unordered_map<Symbol*, std::unique_ptr<MethodInfo>> MethodBlock;
 }
 
-class SymbolTable::MethodInfo : public Entry
-{
+class SymbolTable::MethodInfo : public Entry {
 public:
 	MethodInfo(std::string name, TypeInfo return_type)
-		:Entry(name), return_type(return_type)
-	{}
+		:Entry(name), return_type(return_type) {}
 
 
 	bool add_variable(const std::string& name, TypeInfo type) {
@@ -25,10 +23,11 @@ public:
 		auto it = block.find(symbol);
 		if (it != block.end())
 			return false;
-		
+
 		VariableInfo* var = new VariableInfo(name, type);
 		block.emplace(symbol, std::unique_ptr<VariableInfo>(var));
 		vars.push_back(symbol);
+		return true;
 	}
 
 	bool add_arg(const std::string& name, TypeInfo type) {
@@ -41,18 +40,16 @@ public:
 		VariableInfo* var = new VariableInfo(name, type);
 		block.emplace(symbol, std::unique_ptr<VariableInfo>(var));
 		args.push_back(symbol);
+		return true;
 	}
 
-	const std::vector<Symbol*>& get_args() const
-	{
+	const std::vector<Symbol*>& get_args() const {
 		return args;
 	}
-	const std::vector<Symbol*>& get_vars() const 
-	{
+	const std::vector<Symbol*>& get_vars() const {
 		return vars;
 	}
-	const VariableBlock& get_block() const 
-	{
+	const VariableBlock& get_block() const {
 		return block;
 	}
 	TypeInfo get_return_type() const {

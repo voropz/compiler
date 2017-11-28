@@ -12,13 +12,30 @@ namespace SymbolTable {
 		Int,
 		IntArray,
 		Bool,
-		UserClass
+		UserClass,
+		Void
 	};
 
 	class TypeInfo {
 	public:
+		TypeInfo(Type type, const Symbol* name = nullptr)
+			:type(type), user_class_name(name) 
+		{}
+
 		Type type;
-		Symbol* user_class_name;
+		const Symbol* user_class_name;
+
+		bool operator ==(const TypeInfo& other) const {
+			if (type == Type::UserClass)
+				return user_class_name == other.user_class_name;
+
+			return type == other.type;
+		}
+
+		bool operator !=(const TypeInfo& other) const {
+			return !(*this == other);
+		}
+
 		std::string get_name() const {
 			switch (type) {
 			case Type::Bool:
@@ -29,6 +46,8 @@ namespace SymbolTable {
 				return "int[]";
 			case Type::UserClass:
 				return user_class_name->get_text();
+			case Type::Void:
+				return "void";
 			default:
 				break;
 			}

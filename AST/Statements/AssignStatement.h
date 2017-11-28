@@ -8,7 +8,9 @@
 namespace AST {
 
 	class AssignStatement : public IStatement {
-		friend class Visitor::Printer; friend class Visitor::TableMaker;
+		friend class Visitor::Printer; 
+		friend class Visitor::TableMaker; 
+		friend class Visitor::TypeChecker;
 
 	public:
 		AssignStatement(

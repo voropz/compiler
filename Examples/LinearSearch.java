@@ -17,11 +17,12 @@ class LS {
     public int Start(int sz){
 	int aux01 ;
 	int aux02 ;
+      boolean spoil;
 
 	aux01 = this.Init(sz);
 	aux02 = this.Print();
 	System.out.println(9999);
-	System.out.println(this.Search(8));
+	System.out.println(this.Search(12, spoil));
 	System.out.println(this.Search(12)) ;
 	System.out.println(this.Search(17)) ;
 	System.out.println(this.Search(50)) ;

@@ -6,7 +6,6 @@
 #include <string>
 #include "IncludeList.h"
 
-
 #include <iostream>
 #include "Table.h"
 
@@ -37,8 +36,7 @@ private:
 
 public:
 	TableMaker(Table* table)
-		:table(table)
-	{}
+		:table(table), type(Type::Void) {}
 
 	void Visit(CProgram* node);
 	void Visit(CClass* node);

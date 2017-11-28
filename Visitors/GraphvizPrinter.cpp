@@ -1,6 +1,6 @@
 #include "GraphvizPrinter.h"
 
-void Visitor::Printer::Visit(CProgram* node) {
+	void Visitor::Printer::Visit(CProgram* node) {
 		printVertex(node, "Program");
 		printEdge(node, node->main.get());
 		node->main->Visit(this);
@@ -14,11 +14,11 @@ void Visitor::Printer::Visit(CProgram* node) {
 void Visitor::Printer::Visit(CClass* node) {
 	printVertex(node, "class");
 
-	printEdge(node, node->name.get());
+	printEdge(node, node->name.get(), "name");
 	node->name->Visit(this);
 
 	if (node->extends_name.get()) {
-		printEdge(node, node->extends_name.get());
+		printEdge(node, node->extends_name.get(), "parent");
 		node->extends_name->Visit(this);
 	}
 
@@ -42,32 +42,36 @@ void Visitor::Printer::Visit(CClassSequence* node) {
 }
 
 void Visitor::Printer::Visit(CId* node) {
-	printVertex(node, node->name);
+	printVertex(node, "ID: " + node->name);
 }
 
 void Visitor::Printer::Visit(CMain* node) { 
-	printVertex(node, "Main");
-	printEdge(node, node->class_name.get());
+	printVertex(node, "Main class");
+	printEdge(node, node->class_name.get(), "name");
 	node->class_name->Visit(this);
-	printEdge(node, node->string_name.get());
+	printEdge(node, node->string_name.get(), "public static void main String[]");
 	node->string_name->Visit(this);
-	printEdge(node, node->state.get());
+
+	printEdge(node, node->state.get(), "Statement");
 	node->state->Visit(this);
+
 }
 
 void Visitor::Printer::Visit(CMethod* node) { 
 	printVertex(node, "Method");
-	printEdge(node, node->type.get());
+	printEdge(node, node->type.get(), "return type");
 	node->type->Visit(this);
 
-	printEdge(node, node->name.get());
+	printEdge(node, node->name.get(), "name");
 	node->name->Visit(this);
 
-	printEdge(node, node->parameters.get());
-	node->parameters->Visit(this);
+	if (node->parameters.get()) {
+		printEdge(node, node->parameters.get(), "params");
+		node->parameters->Visit(this);
+	}
 
 	if (node->vars.get()) {
-		printEdge(node, node->vars.get());
+		printEdge(node, node->vars.get(), "local vars");
 		node->vars->Visit(this);
 	}
 
@@ -76,7 +80,7 @@ void Visitor::Printer::Visit(CMethod* node) {
 		node->statements->Visit(this);
 	}
 
-	printEdge(node, node->return_expr.get());
+	printEdge(node, node->return_expr.get(), "returns");
 	node->return_expr->Visit(this);
 
 }
@@ -108,11 +112,11 @@ void Visitor::Printer::Visit(CExpressionSequence* node) {
 void Visitor::Printer::Visit(CVar* node) { 
 	printVertex(node, "Var");
 
-	printEdge(node, node->id.get());
-	node->id->Visit(this);
-
-	printEdge(node, node->type.get());
+	printEdge(node, node->type.get(), "type");
 	node->type->Visit(this);
+
+	printEdge(node, node->id.get(), "name");
+	node->id->Visit(this);
 }
 
 void Visitor::Printer::Visit(CVarSequence* node) {
@@ -133,7 +137,7 @@ void Visitor::Printer::Visit(CallExpression* node) {
 	node->element->Visit(this);
 
 	if (node->arguments.get()) {
-		printEdge(node, node->arguments.get());
+		printEdge(node, node->arguments.get(), "arguments");
 		node->arguments->Visit(this);
 	}
 }
@@ -215,7 +219,7 @@ void Visitor::Printer::Visit(NotExpression* node) {
 }
 
 void Visitor::Printer::Visit(ParenExpression* node) { 
-	printVertex(node, "[]");
+	printVertex(node, "(...)");
 
 	printEdge(node, node->left.get());
 	node->left->Visit(this);
@@ -258,31 +262,31 @@ void Visitor::Printer::Visit(ThisExpression* node) {
 void Visitor::Printer::Visit(WhileStatement* node) { 
 	printVertex(node, "while");
 
-	printEdge(node, node->condition.get());
+	printEdge(node, node->condition.get(), "condition");
 	node->condition->Visit(this);
 
-	printEdge(node, node->body.get());
+	printEdge(node, node->body.get(), "do");
 	node->body->Visit(this);
 }
 
 void Visitor::Printer::Visit(PrintStatement* node) { 
-	printVertex(node, "print");
+	printVertex(node, "System.out.println()");
 
 	printEdge(node, node->body.get());
 	node->body->Visit(this);
 }
 
 void Visitor::Printer::Visit(IfElseStatement* node) { 
-	printVertex(node, "if/else");
+	printVertex(node, "if");
 
-	printEdge(node, node->condition.get());
+	printEdge(node, node->condition.get(), "condition");
 	node->condition->Visit(this);
 
-	printEdge(node, node->body_false.get());
-	node->body_false->Visit(this);
-
-	printEdge(node, node->body_true.get());
+	printEdge(node, node->body_true.get(), "true");
 	node->body_true->Visit(this);
+
+	printEdge(node, node->body_false.get(), "false");
+	node->body_false->Visit(this);
 }
 
 void Visitor::Printer::Visit(BracedSequenceStatement* node) { 
@@ -295,10 +299,10 @@ void Visitor::Printer::Visit(BracedSequenceStatement* node) {
 void Visitor::Printer::Visit(AssignStatement* node) { 
 	printVertex(node, "=");
 
-	printEdge(node, node->left.get());
+	printEdge(node, node->left.get(), "left");
 	node->left->Visit(this);
 
-	printEdge(node, node->right.get());
+	printEdge(node, node->right.get(), "right");
 	node->right->Visit(this);
 }
 

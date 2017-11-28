@@ -6,7 +6,7 @@ namespace AST {
 
 	class ClassType : public IType {
 		friend class Visitor::Printer; 
-		friend class Visitor::TableMaker;
+		friend class Visitor::TableMaker; friend class Visitor::TypeChecker;
 
 	public:
 		ClassType(

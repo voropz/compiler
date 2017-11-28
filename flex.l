@@ -103,7 +103,7 @@ DELIM                         [ \t\r]+
 {ID}                          {yylval.stringValue = yytext; return ID;}
 {INTEGER_LITERAL}             {yylval.intValue = atoi(yytext); return INTEGER_LITERAL;}
 
-.                             {printf("???? !!!!");}
+.                             {printf("Unexpected token: %s\n", yytext); return ERROR;}
 
 %%
 

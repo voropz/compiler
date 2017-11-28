@@ -8,7 +8,7 @@ namespace AST {
 
 	class CId : public INode {
 		friend class Visitor::Printer; 
-		friend class Visitor::TableMaker;
+		friend class Visitor::TableMaker; friend class Visitor::TypeChecker;
 
 	public:
 		CId(std::string name)

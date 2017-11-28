@@ -7,8 +7,8 @@
 namespace AST {
 
 	class NewExpression : public IExpression {
-		friend class Visitor::Printer; friend class Visitor::TableMaker;
-		friend class Visitor::TableMaker;
+		friend class Visitor::Printer; friend class Visitor::TableMaker; friend class Visitor::TypeChecker;
+		friend class Visitor::TableMaker; friend class Visitor::TypeChecker;
 
 	public:
 		NewExpression(

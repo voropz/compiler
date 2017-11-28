@@ -1,4 +1,5 @@
 #include "SymbolTableMaker.h"
+#include <iostream>
 
 void Visitor::TableMaker::Visit(CProgram* node) {
 	node->main->Visit(this);
@@ -6,7 +7,6 @@ void Visitor::TableMaker::Visit(CProgram* node) {
 	if (node->classes.get()) {
 		node->classes->Visit(this);
 	}
-
 }
 
 void Visitor::TableMaker::Visit(CClass* node) {
@@ -16,9 +16,10 @@ void Visitor::TableMaker::Visit(CClass* node) {
 	} else {
 		current_class = table->add_class(node->name->name);
 	}
-	std::cout << current_class->get_name()->get_text();
-
-	assert(current_class != nullptr);
+	if (current_class == nullptr) {
+		std::cout << "Class redefinition: " << node->name->name << std::endl;
+		return;
+	}
 
 	scope = Scope::class_body;
 	if (node->variables.get()) {
@@ -37,8 +38,7 @@ void Visitor::TableMaker::Visit(CClassSequence* node) {
 	}
 }
 
-void Visitor::TableMaker::Visit(CId* node) {
-}
+void Visitor::TableMaker::Visit(CId* node) {}
 
 void Visitor::TableMaker::Visit(CMain* node) {
 
@@ -49,9 +49,16 @@ void Visitor::TableMaker::Visit(CMain* node) {
 
 void Visitor::TableMaker::Visit(CMethod* node) {
 	assert(scope == Scope::class_body);
+
 	// type is determined inside this call:
 	node->type->Visit(this);
+	//3.a
 	current_method = current_class->add_method(node->name->name, type);
+	if (current_method == nullptr) {
+		std::cout << "Method redefinition: " << node->name->name << std::endl;
+		return;
+	}
+
 
 	scope = Scope::method_args;
 	node->parameters->Visit(this);
@@ -60,7 +67,7 @@ void Visitor::TableMaker::Visit(CMethod* node) {
 		node->vars->Visit(this);
 	}
 	if (node->statements.get()) {
-		node->statements->Visit(this);
+		//node->statements->Visit(this);
 	}
 	scope = Scope::class_body;
 }
@@ -77,25 +84,33 @@ void Visitor::TableMaker::Visit(CStatementSequence* node) {
 	}
 }
 
-void Visitor::TableMaker::Visit(CExpressionSequence* node) {
-}
+void Visitor::TableMaker::Visit(CExpressionSequence* node) {}
 
 void Visitor::TableMaker::Visit(CVar* node) {
+
+	if (scope == Scope::outside) {
+		std::cout << "variable outside scope (" << node->id->name << ")\n";
+		return;
+	}
+
 	node->type->Visit(this);
 
-	if (scope == Scope::outside)
-		assert(false);
-
 	if (scope == Scope::class_body) {
-		current_class->add_variable(node->id->name, type);
+		if (current_class->add_variable(node->id->name, type) == nullptr) {
+			std::cout << "Variable redefinition (" << node->id->name << ")\n";
+		}
 	}
 
 	if (scope == Scope::method_body) {
-		current_method->add_variable(node->id->name, type);
+		if (!current_method->add_variable(node->id->name, type)) {
+			std::cout << "Variable redefinition (" << node->id->name << ")\n";
+		}
 	}
 
 	if (scope == Scope::method_args) {
-		current_method->add_arg(node->id->name, type);
+		if (!current_method->add_arg(node->id->name, type)) {
+			std::cout << "Variable redefinition (" << node->id->name << ")\n";
+		}
 	}
 
 }
@@ -106,14 +121,11 @@ void Visitor::TableMaker::Visit(CVarSequence* node) {
 	}
 }
 
-void Visitor::TableMaker::Visit(CallExpression* node) {
-}
+void Visitor::TableMaker::Visit(CallExpression* node) {}
 
-void Visitor::TableMaker::Visit(ArrayExpression* node) {
-}
+void Visitor::TableMaker::Visit(ArrayExpression* node) {}
 
-void Visitor::TableMaker::Visit(AsterExpression* node) {
-}
+void Visitor::TableMaker::Visit(AsterExpression* node) {}
 
 void Visitor::TableMaker::Visit(LowerExpression* node) {
 
@@ -131,35 +143,25 @@ void Visitor::TableMaker::Visit(AndExpression* node) {
 
 }
 
-void Visitor::TableMaker::Visit(NewArrayExpression* node) {
-}
+void Visitor::TableMaker::Visit(NewArrayExpression* node) {}
 
-void Visitor::TableMaker::Visit(NotExpression* node) {
-}
+void Visitor::TableMaker::Visit(NotExpression* node) {}
 
-void Visitor::TableMaker::Visit(ParenExpression* node) {
-}
+void Visitor::TableMaker::Visit(ParenExpression* node) {}
 
-void Visitor::TableMaker::Visit(NewExpression* node) {
-}
+void Visitor::TableMaker::Visit(NewExpression* node) {}
 
-void Visitor::TableMaker::Visit(LengthExpression* node) {
-}
+void Visitor::TableMaker::Visit(LengthExpression* node) {}
 
-void Visitor::TableMaker::Visit(IdExpression* node) {
-}
+void Visitor::TableMaker::Visit(IdExpression* node) {}
 
-void Visitor::TableMaker::Visit(IntegerExpression* node) {
-}
+void Visitor::TableMaker::Visit(IntegerExpression* node) {}
 
-void Visitor::TableMaker::Visit(BoolExpression* node) {
-}
+void Visitor::TableMaker::Visit(BoolExpression* node) {}
 
-void Visitor::TableMaker::Visit(ThisExpression* node) {
-}
+void Visitor::TableMaker::Visit(ThisExpression* node) {}
 
-void Visitor::TableMaker::Visit(WhileStatement* node) {
-}
+void Visitor::TableMaker::Visit(WhileStatement* node) {}
 
 void Visitor::TableMaker::Visit(PrintStatement* node) {
 
@@ -169,8 +171,7 @@ void Visitor::TableMaker::Visit(IfElseStatement* node) {
 
 }
 
-void Visitor::TableMaker::Visit(BracedSequenceStatement* node) {
-}
+void Visitor::TableMaker::Visit(BracedSequenceStatement* node) {}
 
 void Visitor::TableMaker::Visit(AssignStatement* node) {
 

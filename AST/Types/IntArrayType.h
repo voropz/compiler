@@ -5,7 +5,7 @@
 namespace AST {
 
 	class IntArrayType : public IType {
-		friend class Visitor::Printer; friend class Visitor::TableMaker;
+		friend class Visitor::Printer; friend class Visitor::TableMaker; friend class Visitor::TypeChecker;
 
 	public:
 		IntArrayType()

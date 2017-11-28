@@ -7,7 +7,8 @@ namespace AST {
 	class CClassSequence : public INode
 	{
 		friend class Visitor::Printer; 
-		friend class Visitor::TableMaker;
+		friend class Visitor::TableMaker; 
+		friend class Visitor::TypeChecker;
 	private:
 		std::list<std::unique_ptr<CClass>> list;
 

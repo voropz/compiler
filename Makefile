@@ -1,13 +1,15 @@
-
-CPPFLAGS = -I AST -I AST/Expressions -I AST/Statements -I AST/Types -I Visitors -I SymbolTable
+CPPFLAGS = -I AST -I AST/Expressions -I AST/Statements -I AST/Types -I Visitors -I SymbolTable -I .
 
 all: compiler
 
 clean:
-	rm flex.o bison.o graph.o table.o tablevisit.o bison.tab.h bison.tab.c lex.yy.c
+	rm flex.o bison.o graph.o table.o tablevisit.o checker.o bison.tab.h bison.tab.c lex.yy.c bison.output
 
-compiler: bison.o flex.o graph.o table.o tablevisit.o main.cpp
-	g++ -g --std=c++14 $(CPPFLAGS) flex.o bison.o graph.o table.o tablevisit.o main.cpp -lfl -o compiler 
+compiler: bison.o flex.o graph.o table.o tablevisit.o checker.o main.cpp
+	g++ -g --std=c++14 $(CPPFLAGS) flex.o bison.o graph.o table.o tablevisit.o checker.o main.cpp -lfl -o compiler 
+
+checker.o: Visitors/TypeChecker.cpp
+	g++ -g -c --std=c++14 $(CPPFLAGS) Visitors/TypeChecker.cpp -o checker.o
 
 tablevisit.o: Visitors/SymbolTableMaker.cpp
 	g++ -g -c --std=c++14 $(CPPFLAGS) Visitors/SymbolTableMaker.cpp -o tablevisit.o

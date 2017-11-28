@@ -1,13 +1,16 @@
 #include "Table.h"
 #include <fstream>
+#include <iostream>
 
 namespace SymbolTable {
 	ClassInfo* Table::add_class(const std::string& name) {
 		auto symbol = Symbol::get_intern(name);
 
 		auto result = classes.emplace(symbol, std::make_unique<ClassInfo>(name));
-		if (result.second == false)
+		if (result.second == false) {
 			return nullptr;
+		}
+
 		return result.first->second.get();
 	}
 
@@ -15,14 +18,11 @@ namespace SymbolTable {
 		auto parent_symbol = Symbol::get_intern(super_name);
 		auto symbol = Symbol::get_intern(name);
 
-		auto it = classes.find(parent_symbol);
-		if (it == classes.end()) {
+		auto result = classes.emplace(symbol, std::make_unique<ClassInfo>(name, parent_symbol));
+		if (result.second == false) {
 			return nullptr;
 		}
 
-		auto result = classes.emplace(symbol, std::make_unique<ClassInfo>(name, parent_symbol));
-		if (result.second == false)
-			return nullptr;
 		return result.first->second.get();
 	}
 
@@ -34,7 +34,7 @@ namespace SymbolTable {
 		if (it == classes.end()) {
 			return nullptr;
 		}
-		return it->second.get();		
+		return it->second.get();
 	}
 
 	void Table::print(const std::string& path) {
@@ -80,7 +80,7 @@ namespace SymbolTable {
 		for (auto args : method->get_args()) {
 			out << args->get_text() << ", ";
 		}
-		
+
 		out << ")" << std::endl << "Variables: ";
 		for (const auto& var : method->get_block()) {
 			out << var.second->get_type().get_name() << " " << var.second->get_name()->get_text() << ", ";

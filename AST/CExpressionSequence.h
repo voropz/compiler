@@ -6,7 +6,7 @@
 namespace AST {
 	class CExpressionSequence : public INode
 	{
-		friend class Visitor::Printer; friend class Visitor::TableMaker;
+		friend class Visitor::Printer; friend class Visitor::TableMaker; friend class Visitor::TypeChecker;
 	private:
 		std::list<std::unique_ptr<IExpression>> list;
 

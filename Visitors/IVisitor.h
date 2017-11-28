@@ -49,6 +49,7 @@ namespace Visitor {
 	class IVisitor;
 	class Printer;
 	class TableMaker;
+	class TypeChecker;
 }
 
 #define VISIT(NOD) virtual void Visit(AST::NOD* node) = 0;

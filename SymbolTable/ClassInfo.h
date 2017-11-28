@@ -52,6 +52,13 @@ public:
 		const std::vector<const Symbol*>& get_vars() const {
 			return vars;
 		}
+		MethodInfo* get_method(const std::string& name) const {
+			Symbol* int_name = Symbol::get_intern(name);
+			auto it = methods_block.find(int_name);
+			if (it == methods_block.end())
+				return nullptr;
+			return it->second.get();
+		}
 		const VariableBlock& get_var_block() const {
 			return variables_block;
 		}

@@ -7,7 +7,7 @@
 namespace AST {
 
 	class IdExpression : public IExpression {
-		friend class Visitor::Printer; friend class Visitor::TableMaker;
+		friend class Visitor::Printer; friend class Visitor::TableMaker; friend class Visitor::TypeChecker;
 
 	public:
 		IdExpression(CId* id)

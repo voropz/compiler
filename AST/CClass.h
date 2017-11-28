@@ -11,7 +11,8 @@ namespace AST {
 
 	class CClass : public INode {
 		friend class Visitor::Printer; 
-		friend class Visitor::TableMaker;
+		friend class Visitor::TableMaker; 
+		friend class Visitor::TypeChecker;
 
 	public:
 		CClass(

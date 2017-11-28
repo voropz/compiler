@@ -51,17 +51,18 @@
 %token PRINT
 %token ID
 %token INTEGER_LITERAL
+%token ERROR
 
 
 // shift-reduce conflict resolving
 %left LEFT_BRACKET
 %left AND
 %left LOWER
-%left DOT
 %left PLUS MINUS 
 %left ASTER
 %right EXMARK
-
+%left DOT
+%left LEFT_BRACE
 
 // non-terminals
 %union {
@@ -158,7 +159,7 @@ state_s RETURN exp SEMICOLON RIGHT_BRACE { $$ = new CMethod($2, $3, $5, nullptr,
 RETURN exp SEMICOLON RIGHT_BRACE { $$ = new CMethod($2, $3, $5, nullptr, nullptr, $9); }
 
 param_s
-: {}
+: {$$ = new CVarSequence(nullptr, nullptr);}
 | param_s COMMA type id { $$ = new CVarSequence($1, new CVar($3, $4)); }
 | type id { $$ = new CVarSequence(nullptr, new CVar($1, $2)); }
 ;
@@ -207,6 +208,7 @@ exp
 | NEW INT LEFT_BRACKET exp RIGHT_BRACKET { $$ = new NewArrayExpression($4); }
 | NEW id LEFT_PAREN RIGHT_PAREN { $$ = new NewExpression($2); }
 | EXMARK exp { $$ = new NotExpression($2); }
+| EXMARK LEFT_BRACE exp RIGHT_BRACE { $$ = new NotExpression($3); }
 | LEFT_PAREN exp RIGHT_PAREN { $$ = new ParenExpression($2); }
 ;
 
@@ -216,5 +218,6 @@ id
 
 %%
 void yyerror(const char* s) {
-    printf("error %s", s);
+  printf("Grammar error (%s) at %d, %d\n", s, yylloc.first_line, yylloc.first_column);
+  exit(-1);
 }
