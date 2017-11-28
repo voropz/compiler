@@ -63,12 +63,20 @@ void Visitor::TypeChecker::Visit(CId* node) {
 	}
 
 	if (scope == Scope::class_body || scope == Scope::method_body) {
-		const auto& block = current_class->get_var_block();
-		auto it = block.find(my_name);
-		if (it != block.end()) {
-			current_type = it->second.get()->get_type();
-			return;
+		ClassInfo* class_pos = current_class;
+		while (class_pos != nullptr) {
+			const auto& block = class_pos->get_var_block();
+			auto it = block.find(my_name);
+			if (it != block.end()) {
+				current_type = it->second.get()->get_type();
+				return;
+			}
+
+			if (class_pos->get_super() == nullptr)
+				break;
+			class_pos = table->get_class(class_pos->get_super()->get_text());
 		}
+		
 	}
 
 	ClassInfo* class_info = table->get_class(node->name);
@@ -114,7 +122,6 @@ void Visitor::TypeChecker::Visit(CMethod* node) {
 		node->statements->Visit(this);
 	}
 
-	// todo: check type == return_type
 	node->return_expr->Visit(this);
 	scope = Scope::class_body;
 	current_method = nullptr;
@@ -148,7 +155,7 @@ void Visitor::TypeChecker::Visit(CVar* node) {
 	node->type->Visit(this);
 	if (current_type.type == Type::UserClass) {
 		if (table->get_class(current_type.get_name()) == nullptr) {
-			std::cout << "Wrong type of variable: " << current_type.get_name() << " " << node->id->name << std::endl;
+			std::cout << "Unknown type of variable: " << current_type.get_name() << " " << node->id->name << std::endl;
 		}
 	}
 }
@@ -196,7 +203,7 @@ void Visitor::TypeChecker::Visit(CallExpression* node) {
 
 			jt->get()->Visit(this);
 			VariableInfo* var = block.find(*it)->second.get();
-			if (current_type != var->get_type()) {
+			if (!check_types(var->get_type(), current_type)) {
 				std::cout << "Wrong argument in method " << current_type.get_name() << "::" << node->element->name
 					<< ". Expected: " << var->get_type().get_name() << " " << var->get_name()->get_text()
 					<< ", got: " << current_type.get_name() << std::endl;
@@ -390,7 +397,7 @@ void Visitor::TypeChecker::Visit(AssignStatement* node) {
 	TypeInfo left_type = current_type;
 
 	node->right->Visit(this);
-	if (left_type != current_type) {
+	if (!check_types(left_type, current_type)) {
 		std::cout << "Cannot assign " << current_type.get_name() << " to " << left_type.get_name() << " " << node->left->name << std::endl;
 	}
 	current_type = left_type;

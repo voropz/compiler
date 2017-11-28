@@ -35,6 +35,22 @@ private:
 		std::cout << "Operator " << operator_name << " should be applied to " << expected_type << " not " << type << std::endl;
 	}
 
+	// checks types regarding hierarchy
+	bool check_types(const TypeInfo& left, const TypeInfo& right) {
+		if (left == right)
+			return true;
+
+		if (left.type == Type::UserClass && right.type == Type::UserClass) {
+			ClassInfo* right_class = table->get_class(right.get_name());
+			while (right_class->get_super() != nullptr) {
+				right_class = table->get_class(right_class->get_super()->get_text());
+				if (left.user_class_name == right_class->get_name())
+					return true;
+			}
+		}
+		return false;
+	}
+
 
 public:
 	TypeChecker(Table* table)
